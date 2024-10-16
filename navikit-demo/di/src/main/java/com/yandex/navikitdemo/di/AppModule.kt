@@ -11,6 +11,7 @@ import com.yandex.navikitdemo.data.NavigationStyleManagerImpl
 import com.yandex.navikitdemo.data.RequestPointsManagerImpl
 import com.yandex.navikitdemo.data.SettingsManagerImpl
 import com.yandex.navikitdemo.data.SimulationManagerImpl
+import com.yandex.navikitdemo.data.SoundsManagerImpl
 import com.yandex.navikitdemo.data.SpeakerImpl
 import com.yandex.navikitdemo.data.VehicleOptionsManagerImpl
 import com.yandex.navikitdemo.data.helpers.BackgroundServiceManagerImpl
@@ -27,6 +28,7 @@ import com.yandex.navikitdemo.domain.NavigationStyleManager
 import com.yandex.navikitdemo.domain.RequestPointsManager
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.SimulationManager
+import com.yandex.navikitdemo.domain.SoundsManager
 import com.yandex.navikitdemo.domain.SpeakerManager
 import com.yandex.navikitdemo.domain.VehicleOptionsManager
 import com.yandex.navikitdemo.domain.helpers.BackgroundServiceManager
@@ -90,6 +92,9 @@ abstract class AppModule {
 
     @Binds
     abstract fun annotationsManager(impl: AnnotationsManagerImpl): AnnotationsManager
+
+    @Binds
+    abstract fun soundsManager(impl: SoundsManagerImpl): SoundsManager
 
     companion object {
         @Singleton

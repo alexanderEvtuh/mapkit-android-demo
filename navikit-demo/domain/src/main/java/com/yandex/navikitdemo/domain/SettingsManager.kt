@@ -43,6 +43,7 @@ interface SettingsManager {
     val annotationLanguage: SettingModel<AnnotationLanguage>
     val muteAnnotations: SettingModel<Boolean>
     val textAnnotations: SettingModel<Boolean>
+    val preRecordedAnnotations: SettingModel<Boolean>
 
     // Driving Options
     val avoidTolls: SettingModel<Boolean>

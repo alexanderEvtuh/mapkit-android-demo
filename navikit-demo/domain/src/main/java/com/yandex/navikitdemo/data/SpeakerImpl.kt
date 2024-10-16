@@ -1,10 +1,14 @@
 package com.yandex.navikitdemo.data
 
 import android.content.Context
+import android.media.MediaPlayer
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.navikitdemo.domain.SettingsManager
+import com.yandex.navikitdemo.domain.SoundsManager
 import com.yandex.navikitdemo.domain.SpeakerManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.MainScope
@@ -22,6 +26,7 @@ import javax.inject.Singleton
 class SpeakerImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val settingsManager: SettingsManager,
+    private val soundsManager: SoundsManager,
 ) : SpeakerManager {
 
     private val scope = MainScope()
@@ -35,6 +40,14 @@ class SpeakerImpl @Inject constructor(
     }
     private val phrasesImpl = MutableSharedFlow<String>()
 
+    private val mediaPlayer = MediaPlayer()
+
+    private val playerRunnable = Runnable {
+        playMediaIfExists()
+    }
+
+    private val playerHandler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
+
     init {
         settingsManager.annotationLanguage.changes()
             .onEach {
@@ -47,10 +60,16 @@ class SpeakerImpl @Inject constructor(
 
     override fun reset() {
         tts.stop()
+        mediaPlayer.reset()
     }
 
     override fun say(phrase: LocalizedPhrase) {
-        tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
+        if (soundsManager.needUsePreRecorded() && soundsManager.initPhrase(phrase)) {
+            playMediaIfExists()
+        } else {
+            tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
+        }
+
         scope.launch {
             phrasesImpl.emit(phrase.text)
         }
@@ -64,6 +83,29 @@ class SpeakerImpl @Inject constructor(
     private fun updateTtsLanguage() {
         val language = settingsManager.annotationLanguage.value
         tts.language = language.toLocale()
+    }
+
+    private fun playMediaIfExists() {
+        playerHandler.removeCallbacksAndMessages(playerRunnable)
+        try {
+            soundsManager.pollSoundFile()?.let { item ->
+                mediaPlayer.stop()
+                mediaPlayer.reset()
+                mediaPlayer.setDataSource(item.second)
+                mediaPlayer.prepare()
+                mediaPlayer.start()
+                if (soundsManager.hasSoundFile()) {
+                    val durationInMillis = soundsManager.getNextPlayDelay(item.first)
+                    playerHandler.postDelayed(playerRunnable, durationInMillis)
+                }
+            } ?: run {
+                mediaPlayer.stop()
+                mediaPlayer.reset()
+                soundsManager.clear()
+            }
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+        }
     }
 
     private fun AnnotationLanguage.toLocale(): Locale {
