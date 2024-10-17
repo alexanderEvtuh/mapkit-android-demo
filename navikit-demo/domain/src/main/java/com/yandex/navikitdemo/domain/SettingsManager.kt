@@ -56,6 +56,7 @@ interface SettingsManager {
     val showPredicted: SettingModel<Boolean>
     val balloonsGeometry: SettingModel<Boolean>
     val focusRectsAutoUpdate: SettingModel<Boolean>
+    val poi3DModels: SettingModel<Boolean>
 
     // Camera
     val autoZoom: SettingModel<Boolean>
