@@ -44,6 +44,7 @@ class CameraManagerImpl @Inject constructor(
 
     override fun start(scope: CoroutineScope) {
         subscribeFirstLocationObtained().launchIn(scope)
+        subscribeHdMode().launchIn(scope)
     }
 
     override fun changeZoomByStep(step: CameraManager.ZoomStep) {
@@ -79,5 +80,10 @@ class CameraManagerImpl @Inject constructor(
                 isLocationUnknown = false
                 moveCameraToUserLocation()
             }
+    }
+
+    private fun subscribeHdMode(): Flow<*> {
+        return settingsManager.hdMode.changes()
+            .onEach(map::setHdModeEnabled)
     }
 }
