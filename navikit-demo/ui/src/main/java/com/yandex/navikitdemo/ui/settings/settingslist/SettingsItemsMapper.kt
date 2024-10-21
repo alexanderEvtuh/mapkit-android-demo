@@ -83,6 +83,7 @@ class SettingsItemsMapper @Inject constructor(
                 SettingsItem.Toggle("Traffics Lights", settingsManager.trafficLight),
                 SettingsItem.Toggle("Show Predicted", settingsManager.showPredicted),
                 SettingsItem.Toggle("Balloons Geometry", settingsManager.balloonsGeometry),
+                SettingsItem.Toggle("POI 3D models", settingsManager.poi3DModels),
             )
             SettingsScreen.SIMULATION -> listOf(
                 SettingsItem.Toggle("Simulation", settingsManager.simulation),

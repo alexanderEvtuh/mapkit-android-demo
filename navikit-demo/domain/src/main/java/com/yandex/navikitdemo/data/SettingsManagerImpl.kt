@@ -71,6 +71,7 @@ class SettingsManagerImpl @Inject constructor(
     override val showPredicted = boolean("showPredicted", false)
     override val balloonsGeometry = boolean("balloonsGeometry", false)
     override val focusRectsAutoUpdate = boolean("focusRectsAutoUpdate", true)
+    override val poi3DModels = boolean("poi3DModels", true)
 
     // Camera
     override val autoZoom = boolean("autoZoom", true)

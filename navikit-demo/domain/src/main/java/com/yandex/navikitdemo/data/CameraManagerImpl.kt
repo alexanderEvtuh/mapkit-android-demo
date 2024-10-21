@@ -44,6 +44,7 @@ class CameraManagerImpl @Inject constructor(
 
     override fun start(scope: CoroutineScope) {
         subscribeFirstLocationObtained().launchIn(scope)
+        subscribeEnable3DSuperPOI().launchIn(scope)
     }
 
     override fun changeZoomByStep(step: CameraManager.ZoomStep) {
@@ -79,5 +80,10 @@ class CameraManagerImpl @Inject constructor(
                 isLocationUnknown = false
                 moveCameraToUserLocation()
             }
+    }
+
+    private fun subscribeEnable3DSuperPOI(): Flow<*> {
+        return settingsManager.poi3DModels.changes()
+            .onEach(map::setAwesomeModelsEnabled)
     }
 }
