@@ -3,16 +3,14 @@ package com.yandex.navikitdemo.domain
 import android.content.res.AssetFileDescriptor
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
+import com.yandex.navikitdemo.domain.models.LocalPhrase
 
 interface SoundsManager {
     fun needUsePreRecorded(): Boolean
     fun initPhrase(phrase: LocalizedPhrase): Boolean
-    fun updateDurations()
 
-    fun pollSoundFile(): Pair<SpeakerPhraseToken, AssetFileDescriptor>?
+    fun pollSoundFile(): LocalPhrase?
     fun hasSoundFile(): Boolean
-
-    fun getNextPlayDelay(phrase: SpeakerPhraseToken): Long
 
     fun clear()
 }
