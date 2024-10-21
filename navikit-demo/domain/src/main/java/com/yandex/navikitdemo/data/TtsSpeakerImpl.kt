@@ -19,7 +19,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SpeakerImpl @Inject constructor(
+class TtsSpeakerImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val settingsManager: SettingsManager,
 ) : SpeakerManager {
@@ -50,7 +50,8 @@ class SpeakerImpl @Inject constructor(
     }
 
     override fun say(phrase: LocalizedPhrase) {
-        tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
+            tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
+
         scope.launch {
             phrasesImpl.emit(phrase.text)
         }
