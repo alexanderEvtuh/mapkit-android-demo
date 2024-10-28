@@ -50,7 +50,7 @@ class TtsSpeakerImpl @Inject constructor(
     }
 
     override fun say(phrase: LocalizedPhrase) {
-            tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
+        tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
 
         scope.launch {
             phrasesImpl.emit(phrase.text)

@@ -9,6 +9,7 @@ import com.yandex.navikitdemo.data.LocationManagerImpl
 import com.yandex.navikitdemo.data.NavigationHolderImpl
 import com.yandex.navikitdemo.data.NavigationManagerImpl
 import com.yandex.navikitdemo.data.NavigationStyleManagerImpl
+import com.yandex.navikitdemo.data.PlayerManagerImpl
 import com.yandex.navikitdemo.data.RequestPointsManagerImpl
 import com.yandex.navikitdemo.data.SettingsManagerImpl
 import com.yandex.navikitdemo.data.SimulationManagerImpl
@@ -27,6 +28,7 @@ import com.yandex.navikitdemo.domain.LocationManager
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.NavigationManager
 import com.yandex.navikitdemo.domain.NavigationStyleManager
+import com.yandex.navikitdemo.domain.PlayerManager
 import com.yandex.navikitdemo.domain.RequestPointsManager
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.SimulationManager
@@ -109,6 +111,9 @@ abstract class AppModule {
 
     @Binds
     abstract fun speakerTokens(impl: SpeakerTokensImpl): SpeakerTokensManager
+
+    @Binds
+    abstract fun playerManager(impl: PlayerManagerImpl): PlayerManager
 
     companion object {
         @Singleton

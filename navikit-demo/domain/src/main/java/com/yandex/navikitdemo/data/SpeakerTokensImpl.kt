@@ -5,7 +5,7 @@ import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.SpeakerTokensManager
-import com.yandex.navikitdemo.domain.models.LocalPhrase
+import com.yandex.navikitdemo.domain.models.LocalToken
 import com.yandex.navikitdemo.domain.utils.path
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.MainScope
@@ -42,8 +42,8 @@ class SpeakerTokensImpl @Inject constructor(
             .launchIn(scope)
     }
 
-    override fun getLocalPhrase(token: SpeakerPhraseToken, path: String): LocalPhrase =
-        LocalPhrase(token, assets.openFd(path), soundDurations[token.path] ?: 0.0)
+    override fun getLocalPhrase(token: SpeakerPhraseToken, path: String): LocalToken =
+        LocalToken(token, assets.openFd(path), soundDurations[token.path] ?: 0.0)
 
     fun updateDurations() {
         soundDurations.clear()

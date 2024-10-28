@@ -1,11 +1,10 @@
 package com.yandex.navikitdemo.data
 
-import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import com.yandex.mapkit.annotations.LocalizedPhrase
+import com.yandex.navikitdemo.domain.PlayerManager
 import com.yandex.navikitdemo.domain.SoundsManager
 import com.yandex.navikitdemo.domain.SpeakerManager
+import com.yandex.navikitdemo.domain.models.LocalPhrase
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,28 +15,22 @@ import javax.inject.Singleton
 @Singleton
 class LocalSpeakerImpl @Inject constructor(
     private val soundsManager: SoundsManager,
+    private val playerManager: PlayerManager
 ) : SpeakerManager {
 
     private val scope = MainScope()
     private val phrasesImpl = MutableSharedFlow<String>()
 
-    private val mediaPlayer = MediaPlayer()
-
-    private val playerRunnable = Runnable {
-        playMediaIfExists()
-    }
-
-    private val playerHandler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
+    private var localPhrase: LocalPhrase? = null
 
     override fun phrases(): Flow<String> = phrasesImpl
 
     override fun reset() {
-        mediaPlayer.reset()
+        playerManager.reset()
     }
 
     override fun say(phrase: LocalizedPhrase) {
-        soundsManager.initPhrase(phrase)
-        playMediaIfExists()
+        localPhrase?.let(playerManager::play) ?: return
 
         scope.launch {
             phrasesImpl.emit(phrase.text)
@@ -45,29 +38,7 @@ class LocalSpeakerImpl @Inject constructor(
     }
 
     override fun duration(phrase: LocalizedPhrase): Double {
-        // Heuristic formula for the russian language.
-        return phrase.text.length * 0.06 + 0.6
-    }
-
-    private fun playMediaIfExists() {
-        playerHandler.removeCallbacksAndMessages(playerRunnable)
-        try {
-            soundsManager.pollSoundFile()?.let { item ->
-                mediaPlayer.stop()
-                mediaPlayer.reset()
-                mediaPlayer.setDataSource(item.fileDescriptor)
-                mediaPlayer.prepare()
-                mediaPlayer.start()
-                if (soundsManager.hasSoundFile()) {
-                    playerHandler.postDelayed(playerRunnable, item.duration.toLong())
-                }
-            } ?: run {
-                mediaPlayer.stop()
-                mediaPlayer.reset()
-                soundsManager.clear()
-            }
-        } catch (e: IllegalStateException) {
-            e.printStackTrace()
-        }
+        localPhrase = soundsManager.generateLocalPhrase(phrase)
+        return (localPhrase?.summDuration() ?: 0.0) / 1000.0
     }
 }
