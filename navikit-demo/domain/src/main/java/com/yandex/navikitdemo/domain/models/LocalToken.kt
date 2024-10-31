@@ -10,5 +10,5 @@ data class LocalToken(
 )
 
 class LocalPhrase(val items: List<LocalToken>) {
-    fun summDuration() = items.sumOf { it.duration }
+    val duration by lazy { items.sumOf { it.duration } }
 }

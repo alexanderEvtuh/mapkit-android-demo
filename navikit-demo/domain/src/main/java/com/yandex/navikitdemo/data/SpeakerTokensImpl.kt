@@ -42,7 +42,7 @@ class SpeakerTokensImpl @Inject constructor(
             .launchIn(scope)
     }
 
-    override fun getLocalPhrase(token: SpeakerPhraseToken, path: String): LocalToken =
+    override fun getLocalToken(token: SpeakerPhraseToken, path: String): LocalToken =
         LocalToken(token, assets.openFd(path), soundDurations[token.path] ?: 0.0)
 
     fun updateDurations() {

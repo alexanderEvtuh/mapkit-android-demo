@@ -13,5 +13,5 @@ class SoundsManagerImpl @Inject constructor(
 ) : SoundsManager {
 
     override fun generateLocalPhrase(phrase: LocalizedPhrase): LocalPhrase =
-        LocalPhrase(phraseToSpeakerTokensMapper.map(phrase))
+        phraseToSpeakerTokensMapper.map(phrase)
 }

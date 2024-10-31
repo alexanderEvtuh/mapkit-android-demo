@@ -2,7 +2,7 @@ package com.yandex.navikitdemo.data
 
 import android.media.MediaPlayer
 import com.yandex.navikitdemo.domain.PlayerManager
-import com.yandex.navikitdemo.domain.models.LocalPhrase
+import com.yandex.navikitdemo.domain.models.LocalToken
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -17,9 +17,9 @@ class PlayerManagerImpl @Inject constructor() : PlayerManager {
 
     private var playListJob: Job? = null
 
-    override fun play(phrase: LocalPhrase) {
+    override fun play(queue: List<LocalToken>) {
         playListJob?.cancel()
-        playListJob = phrase.items.asFlow()
+        playListJob = queue.asFlow()
             .onEach {
                 mediaPlayer.stop()
                 mediaPlayer.reset()

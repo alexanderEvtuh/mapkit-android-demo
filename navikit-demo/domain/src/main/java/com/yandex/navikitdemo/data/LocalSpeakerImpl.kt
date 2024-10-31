@@ -30,7 +30,7 @@ class LocalSpeakerImpl @Inject constructor(
     }
 
     override fun say(phrase: LocalizedPhrase) {
-        localPhrase?.let(playerManager::play) ?: return
+        localPhrase?.items?.let(playerManager::play) ?: return
 
         scope.launch {
             phrasesImpl.emit(phrase.text)
@@ -39,6 +39,6 @@ class LocalSpeakerImpl @Inject constructor(
 
     override fun duration(phrase: LocalizedPhrase): Double {
         localPhrase = soundsManager.generateLocalPhrase(phrase)
-        return (localPhrase?.summDuration() ?: 0.0) / 1000.0
+        return (localPhrase?.duration ?: 0.0) / 1000.0
     }
 }

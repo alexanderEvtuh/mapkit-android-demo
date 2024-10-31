@@ -6,6 +6,7 @@ import com.yandex.mapkit.annotations.SpeakerPhraseToken
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.SpeakerTokensManager
 import com.yandex.navikitdemo.domain.mappers.PhraseToSpeakerTokensMapper
+import com.yandex.navikitdemo.domain.models.LocalPhrase
 import com.yandex.navikitdemo.domain.models.LocalToken
 import com.yandex.navikitdemo.domain.utils.path
 import javax.inject.Inject
@@ -18,8 +19,8 @@ class PhraseToSpeakerTokensMapperImpl @Inject constructor(
     private val speakerTokens: SpeakerTokensManager
 ) : PhraseToSpeakerTokensMapper {
 
-    override fun map(phrase: LocalizedPhrase): List<LocalToken> {
-        val localPhrases = mutableListOf<LocalToken>()
+    override fun map(phrase: LocalizedPhrase): LocalPhrase {
+        val localTokens = mutableListOf<LocalToken>()
         val path = when {
             phrase.tokens.map { it.path }
                 .contains(SpeakerPhraseToken.SPEED_LIMIT_EXCEEDED.path) -> "sounds/default/%s/0.mp3"
@@ -31,8 +32,8 @@ class PhraseToSpeakerTokensMapperImpl @Inject constructor(
         }
 
         phrase.tokens.forEach {
-            localPhrases.add(speakerTokens.getLocalPhrase(it, String.format(path, it.path)))
+            localTokens.add(speakerTokens.getLocalToken(it, String.format(path, it.path)))
         }
-        return localPhrases
+        return LocalPhrase(localTokens)
     }
 }
