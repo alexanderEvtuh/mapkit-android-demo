@@ -1,12 +1,12 @@
 package com.yandex.navikitdemo.domain.models
 
-import android.content.res.AssetFileDescriptor
+import android.net.Uri
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
 
 data class LocalToken(
     val token: SpeakerPhraseToken,
-    val fileDescriptor: AssetFileDescriptor,
-    val duration: Double
+    val duration: Double,
+    val uri: Uri,
 )
 
 class LocalPhrase(val items: List<LocalToken>) {

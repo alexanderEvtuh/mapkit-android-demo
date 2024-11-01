@@ -1,6 +1,7 @@
 package com.yandex.navikitdemo.data
 
 import android.content.Context
+import android.net.Uri
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
 import com.yandex.navikitdemo.domain.SettingsManager
@@ -23,11 +24,6 @@ class SpeakerTokensImpl @Inject constructor(
     private val settingsManager: SettingsManager,
 ) : SpeakerTokensManager {
 
-    private companion object {
-        const val OFFSET_EN = 280L
-        const val OFFSET_RU = 0L
-    }
-
     private val scope = MainScope()
 
     private val soundDurations = mutableMapOf<String, Double>()
@@ -43,7 +39,7 @@ class SpeakerTokensImpl @Inject constructor(
     }
 
     override fun getLocalToken(token: SpeakerPhraseToken, path: String): LocalToken =
-        LocalToken(token, assets.openFd(path), soundDurations[token.path] ?: 0.0)
+        LocalToken(token, soundDurations[token.path] ?: 0.0, Uri.parse("asset:///$path"))
 
     fun updateDurations() {
         soundDurations.clear()
@@ -70,12 +66,7 @@ class SpeakerTokensImpl @Inject constructor(
                     jsonObject.getJSONObject(key).let { keyObject ->
                         if (keyObject.has("0.mp3")) {
                             keyObject.getDouble("0.mp3").takeIf { it > 0 }?.let { value ->
-                                soundDurations[key] =
-                                    value * 1000 - when (settingsManager.annotationLanguage.value) {
-                                        AnnotationLanguage.RUSSIAN -> OFFSET_RU
-                                        AnnotationLanguage.ENGLISH -> OFFSET_EN
-                                        else -> 0
-                                    }
+                                soundDurations[key] = value * 1000
                             }
                         }
                     }

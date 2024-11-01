@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.yandex.navikitdemo.domain'
-    compileSdk 33
+    compileSdk 34
     buildToolsVersion "33.0.0"
 
     defaultConfig {
@@ -30,6 +30,7 @@ dependencies {
 
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+    implementation "androidx.media3:media3-exoplayer:${rootProject.ext.exoPlayerVersion}"
 
     implementation "com.google.dagger:hilt-android:${rootProject.ext.hiltVersion}"
     kapt "com.google.dagger:hilt-compiler:${rootProject.ext.hiltVersion}"
