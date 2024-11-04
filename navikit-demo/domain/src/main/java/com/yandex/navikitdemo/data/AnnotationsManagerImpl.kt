@@ -2,19 +2,17 @@ package com.yandex.navikitdemo.data
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.yandex.mapkit.annotations.AnnotationLanguage
+import com.yandex.mapkit.annotations.Speaker
 import com.yandex.mapkit.navigation.automotive.Annotator
 import com.yandex.mapkit.navigation.automotive.AnnotatorListener
 import com.yandex.navikitdemo.domain.AnnotationsManager
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.SettingsManager
-import com.yandex.navikitdemo.domain.SpeakerManager
 import com.yandex.navikitdemo.domain.models.AnnotatedEventsType
 import com.yandex.navikitdemo.domain.models.AnnotatedRoadEventsType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -29,14 +27,16 @@ class AnnotationsManagerImpl @Inject constructor(
     navigationHolder: NavigationHolder,
     @ApplicationContext private val context: Context,
     private val settingsManager: SettingsManager,
-    private val ttsSpeaker: SpeakerManager,
-    @Named("localSpeaker") private val localSpeaker: SpeakerManager,
+    private val ttsSpeaker: Speaker,
+    @Named("localSpeaker") private val localSpeaker: Speaker,
 ) : AnnotationsManager {
 
     private val scope = MainScope() + Dispatchers.Main.immediate
     private var annotator: Annotator = navigationHolder.navigation.value.guidance.annotator
 
-    private var annotationToastsJob: Job? = null
+    private val ttsToastSpeaker = ToastSpeaker(context, ttsSpeaker)
+    private val localToastSpeaker = ToastSpeaker(context, localSpeaker)
+
 
     private val annotatorListener = object : AnnotatorListener {
         override fun manoeuvreAnnotated() {
@@ -58,7 +58,7 @@ class AnnotationsManagerImpl @Inject constructor(
 
     init {
         annotator.apply {
-            setSpeaker(ttsSpeaker)
+            setSpeaker(if (settingsManager.textAnnotations.value) ttsToastSpeaker else ttsSpeaker)
             addListener(annotatorListener)
         }
 
@@ -70,21 +70,20 @@ class AnnotationsManagerImpl @Inject constructor(
 
         combine(
             settingsManager.annotationLanguage.changes(),
-            settingsManager.preRecordedAnnotations.changes()
-        ) { language, preRecordedEnabled ->
+            settingsManager.preRecordedAnnotations.changes(),
+            settingsManager.textAnnotations.changes(),
+        ) { language, preRecordedEnabled, textAnnotationsEnabled ->
             if (language in listOf(
                     AnnotationLanguage.RUSSIAN,
                     AnnotationLanguage.ENGLISH
                 ) && preRecordedEnabled
             ) {
-                localSpeaker
+                if (textAnnotationsEnabled) localToastSpeaker else localSpeaker
             } else {
-                ttsSpeaker
+                if (textAnnotationsEnabled) ttsToastSpeaker else ttsSpeaker
             }.let { speaker ->
                 changeSpeaker(speaker)
-                reInitAnnotationsToast(speaker)
             }
-
         }.launchIn(scope)
     }
 
@@ -116,12 +115,6 @@ class AnnotationsManagerImpl @Inject constructor(
         return if (isEnabled) mask or event else mask and event.inv()
     }
 
-    private fun tryShowAnnotationToast(message: String) {
-        if (settingsManager.textAnnotations.value) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     private fun recreateAnnotator(otherAnnotator: Annotator) {
         annotator.apply {
             removeListener(annotatorListener)
@@ -129,22 +122,16 @@ class AnnotationsManagerImpl @Inject constructor(
         }
         annotator = otherAnnotator
         annotator.apply {
-            setSpeaker(ttsSpeaker)
+            setSpeaker(
+                if (settingsManager.textAnnotations.value) ttsToastSpeaker else ttsSpeaker
+            )
             addListener(annotatorListener)
         }
     }
 
-    private fun changeSpeaker(speaker: SpeakerManager) {
+    private fun changeSpeaker(speaker: Speaker) {
+        annotator.setSpeaker(null)
         annotator.setSpeaker(speaker)
-    }
-
-    private fun reInitAnnotationsToast(speaker: SpeakerManager) {
-        annotationToastsJob?.cancel()
-        annotationToastsJob = speaker.phrases()
-            .onEach {
-                tryShowAnnotationToast(it)
-            }
-            .launchIn(scope)
     }
 
     private companion object {

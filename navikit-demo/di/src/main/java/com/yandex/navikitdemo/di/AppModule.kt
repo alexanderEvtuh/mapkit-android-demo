@@ -3,6 +3,7 @@ package com.yandex.navikitdemo.di
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
+import com.yandex.mapkit.annotations.Speaker
 import com.yandex.navikitdemo.data.AnnotationsManagerImpl
 import com.yandex.navikitdemo.data.LocalSpeakerImpl
 import com.yandex.navikitdemo.data.LocationManagerImpl
@@ -33,7 +34,6 @@ import com.yandex.navikitdemo.domain.RequestPointsManager
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.SimulationManager
 import com.yandex.navikitdemo.domain.SoundsManager
-import com.yandex.navikitdemo.domain.SpeakerManager
 import com.yandex.navikitdemo.domain.SpeakerTokensManager
 import com.yandex.navikitdemo.domain.VehicleOptionsManager
 import com.yandex.navikitdemo.domain.helpers.BackgroundServiceManager
@@ -94,11 +94,11 @@ abstract class AppModule {
     abstract fun navigationHolder(impl: NavigationHolderImpl): NavigationHolder
 
     @Binds
-    abstract fun speakerManager(impl: TtsSpeakerImpl): SpeakerManager
+    abstract fun speakerManager(impl: TtsSpeakerImpl): Speaker
 
     @Named("localSpeaker")
     @Binds
-    abstract fun localSpeakerManager(impl: LocalSpeakerImpl): SpeakerManager
+    abstract fun localSpeakerManager(impl: LocalSpeakerImpl): Speaker
 
     @Binds
     abstract fun annotationsManager(impl: AnnotationsManagerImpl): AnnotationsManager

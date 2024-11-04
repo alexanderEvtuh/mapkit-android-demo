@@ -4,15 +4,12 @@ import android.content.Context
 import android.speech.tts.TextToSpeech
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.LocalizedPhrase
+import com.yandex.mapkit.annotations.Speaker
 import com.yandex.navikitdemo.domain.SettingsManager
-import com.yandex.navikitdemo.domain.SpeakerManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
@@ -22,7 +19,7 @@ import javax.inject.Singleton
 class TtsSpeakerImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val settingsManager: SettingsManager,
-) : SpeakerManager {
+) : Speaker {
 
     private val scope = MainScope()
 
@@ -33,7 +30,6 @@ class TtsSpeakerImpl @Inject constructor(
             updateTtsLanguage()
         }
     }
-    private val phrasesImpl = MutableSharedFlow<String>()
 
     init {
         settingsManager.annotationLanguage.changes()
@@ -43,18 +39,12 @@ class TtsSpeakerImpl @Inject constructor(
             .launchIn(scope)
     }
 
-    override fun phrases(): Flow<String> = phrasesImpl
-
     override fun reset() {
         tts.stop()
     }
 
     override fun say(phrase: LocalizedPhrase) {
         tts.speak(phrase.text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
-
-        scope.launch {
-            phrasesImpl.emit(phrase.text)
-        }
     }
 
     override fun duration(phrase: LocalizedPhrase): Double {
