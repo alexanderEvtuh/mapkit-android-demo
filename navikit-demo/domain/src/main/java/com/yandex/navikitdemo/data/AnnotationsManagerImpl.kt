@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.plus
 import javax.inject.Inject
 import javax.inject.Named
@@ -34,9 +34,8 @@ class AnnotationsManagerImpl @Inject constructor(
     private val scope = MainScope() + Dispatchers.Main.immediate
     private var annotator: Annotator = navigationHolder.navigation.value.guidance.annotator
 
-    private val ttsToastSpeaker = ToastSpeaker(context, ttsSpeaker)
-    private val localToastSpeaker = ToastSpeaker(context, localSpeaker)
-
+    private val ttsToastSpeaker by lazy { ToastSpeaker(context, ttsSpeaker) }
+    private val localToastSpeaker by lazy { ToastSpeaker(context, localSpeaker) }
 
     private val annotatorListener = object : AnnotatorListener {
         override fun manoeuvreAnnotated() {
@@ -57,23 +56,13 @@ class AnnotationsManagerImpl @Inject constructor(
     }
 
     init {
-        annotator.apply {
-            setSpeaker(if (settingsManager.textAnnotations.value) ttsToastSpeaker else ttsSpeaker)
-            addListener(annotatorListener)
-        }
-
-        navigationHolder.navigation
-            .onEach {
-                recreateAnnotator(it.guidance.annotator)
-            }
-            .launchIn(scope)
-
-        combine(
+        val annotatorFlow = navigationHolder.navigation.map { it.guidance.annotator }
+        val speakerFlow = combine(
             settingsManager.annotationLanguage.changes(),
             settingsManager.preRecordedAnnotations.changes(),
             settingsManager.textAnnotations.changes(),
         ) { language, preRecordedEnabled, textAnnotationsEnabled ->
-            if (language in listOf(
+            return@combine if (language in listOf(
                     AnnotationLanguage.RUSSIAN,
                     AnnotationLanguage.ENGLISH
                 ) && preRecordedEnabled
@@ -81,10 +70,23 @@ class AnnotationsManagerImpl @Inject constructor(
                 if (textAnnotationsEnabled) localToastSpeaker else localSpeaker
             } else {
                 if (textAnnotationsEnabled) ttsToastSpeaker else ttsSpeaker
-            }.let { speaker ->
-                changeSpeaker(speaker)
             }
-        }.launchIn(scope)
+        }
+
+        combine(speakerFlow, annotatorFlow) { speaker, otherAnnotator ->
+            annotator.apply {
+                removeListener(annotatorListener)
+                setSpeaker(null)
+            }
+            if (annotator != otherAnnotator) {
+                annotator = otherAnnotator
+            }
+            annotator.apply {
+                setSpeaker(speaker)
+                addListener(annotatorListener)
+            }
+        }
+            .launchIn(scope)
     }
 
     override fun setAnnotationsEnabled(isEnabled: Boolean) {
@@ -113,25 +115,6 @@ class AnnotationsManagerImpl @Inject constructor(
 
     private fun applyEventAvailabilityToMask(event: Int, isEnabled: Boolean, mask: Int): Int {
         return if (isEnabled) mask or event else mask and event.inv()
-    }
-
-    private fun recreateAnnotator(otherAnnotator: Annotator) {
-        annotator.apply {
-            removeListener(annotatorListener)
-            setSpeaker(null)
-        }
-        annotator = otherAnnotator
-        annotator.apply {
-            setSpeaker(
-                if (settingsManager.textAnnotations.value) ttsToastSpeaker else ttsSpeaker
-            )
-            addListener(annotatorListener)
-        }
-    }
-
-    private fun changeSpeaker(speaker: Speaker) {
-        annotator.setSpeaker(null)
-        annotator.setSpeaker(speaker)
     }
 
     private companion object {
