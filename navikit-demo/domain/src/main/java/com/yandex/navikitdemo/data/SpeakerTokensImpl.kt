@@ -1,80 +1,34 @@
 package com.yandex.navikitdemo.data
 
-import android.content.Context
 import android.net.Uri
-import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
-import com.yandex.navikitdemo.domain.SettingsManager
+import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import com.yandex.navikitdemo.domain.SpeakerTokensManager
 import com.yandex.navikitdemo.domain.models.LocalToken
 import com.yandex.navikitdemo.domain.utils.path
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.json.JSONObject
-import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
 class SpeakerTokensImpl @Inject constructor(
-    @ApplicationContext context: Context,
-    private val settingsManager: SettingsManager,
+    private val localLanguageProvider: LocalLanguageProvider,
 ) : SpeakerTokensManager {
 
     private val scope = MainScope()
 
     private val soundDurations = mutableMapOf<String, Double>()
 
-    private val assets = context.assets
-
     init {
-        settingsManager.annotationLanguage.changes()
-            .onEach {
-                updateDurations()
-            }
-            .launchIn(scope)
+        localLanguageProvider.changes().onEach {
+            soundDurations.clear()
+            soundDurations.putAll(it.getDurations())
+        }.launchIn(scope)
     }
 
     override fun getLocalToken(token: SpeakerPhraseToken, path: String): LocalToken =
         LocalToken(token, soundDurations[token.path] ?: 0.0, Uri.parse("asset:///$path"))
-
-    fun updateDurations() {
-        soundDurations.clear()
-        val json = try {
-            val inputStream = when (settingsManager.annotationLanguage.value) {
-                AnnotationLanguage.RUSSIAN -> assets.open("sounds/ru_female/durations.json")
-                AnnotationLanguage.ENGLISH -> assets.open("sounds/en_male/durations.json")
-                else -> return
-            }
-            val size = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-            String(buffer, Charset.forName("UTF-8"))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return
-        }
-
-        try {
-            val jsonObject = JSONObject(json)
-            SpeakerPhraseToken.values().map { it.path }.forEach { key ->
-                if (jsonObject.has(key)) {
-                    jsonObject.getJSONObject(key).let { keyObject ->
-                        if (keyObject.has("0.mp3")) {
-                            keyObject.getDouble("0.mp3").takeIf { it > 0 }?.let { value ->
-                                soundDurations[key] = value * 1000
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return
-        }
-    }
 }

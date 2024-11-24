@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import com.yandex.mapkit.annotations.Speaker
 import com.yandex.navikitdemo.data.AnnotationsManagerImpl
+import com.yandex.navikitdemo.data.LocalLanguageProviderImpl
 import com.yandex.navikitdemo.data.LocalSpeakerImpl
 import com.yandex.navikitdemo.data.LocationManagerImpl
 import com.yandex.navikitdemo.data.NavigationHolderImpl
@@ -25,6 +26,7 @@ import com.yandex.navikitdemo.data.helpers.NavigationFactoryImpl
 import com.yandex.navikitdemo.data.helpers.NavigationSuspenderManagerImpl
 import com.yandex.navikitdemo.data.mappers.PhraseToSpeakerTokensMapperImpl
 import com.yandex.navikitdemo.domain.AnnotationsManager
+import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import com.yandex.navikitdemo.domain.LocationManager
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.NavigationManager
@@ -114,6 +116,9 @@ abstract class AppModule {
 
     @Binds
     abstract fun playerManager(impl: PlayerManagerImpl): PlayerManager
+
+    @Binds
+    abstract fun localLanguageProvider(impl: LocalLanguageProviderImpl): LocalLanguageProvider
 
     companion object {
         @Singleton

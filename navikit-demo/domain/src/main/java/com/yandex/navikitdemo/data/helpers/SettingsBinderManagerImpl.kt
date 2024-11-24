@@ -1,7 +1,9 @@
 package com.yandex.navikitdemo.data.helpers
 
 import com.yandex.mapkit.road_events_layer.RoadEventsLayer
+import com.yandex.navikitdemo.data.LocalLanguageData
 import com.yandex.navikitdemo.domain.AnnotationsManager
+import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.NavigationLayerManager
 import com.yandex.navikitdemo.domain.NavigationManager
@@ -31,6 +33,7 @@ class SettingsBinderManagerImpl @Inject constructor(
     private val backgroundServiceManager: BackgroundServiceManager,
     private val navigationManager: NavigationManager,
     private val navigationHolder: NavigationHolder,
+    private val localLanguageProvider: LocalLanguageProvider,
 ) : SettingsBinderManager {
 
     override fun applySettingsChanges(scope: CoroutineScope) {
@@ -156,6 +159,10 @@ class SettingsBinderManagerImpl @Inject constructor(
 
         settings.muteAnnotations.changes()
             .onEach { annotationsManager.setAnnotationsEnabled(!it) }
+            .launchIn(this)
+
+        settings.annotationLanguage.changes()
+            .onEach { localLanguageProvider.emitLanguage(it) }
             .launchIn(this)
     }
 
