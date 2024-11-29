@@ -1,7 +1,6 @@
 package com.yandex.navikitdemo.data.helpers
 
 import com.yandex.mapkit.road_events_layer.RoadEventsLayer
-import com.yandex.navikitdemo.data.LocalLanguageData
 import com.yandex.navikitdemo.domain.AnnotationsManager
 import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import com.yandex.navikitdemo.domain.NavigationHolder
