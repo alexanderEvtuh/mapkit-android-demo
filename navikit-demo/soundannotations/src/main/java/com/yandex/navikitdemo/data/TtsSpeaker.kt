@@ -5,7 +5,7 @@ import android.speech.tts.TextToSpeech
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.mapkit.annotations.Speaker
-import com.yandex.navikitdemo.domain.SettingsManager
+import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
@@ -16,9 +16,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TtsSpeakerImpl @Inject constructor(
+class TtsSpeaker @Inject constructor(
     @ApplicationContext context: Context,
-    private val settingsManager: SettingsManager,
+    private val languageProvider: LocalLanguageProvider,
 ) : Speaker {
 
     private val scope = MainScope()
@@ -32,7 +32,7 @@ class TtsSpeakerImpl @Inject constructor(
     }
 
     init {
-        settingsManager.annotationLanguage.changes()
+        languageProvider.changes()
             .onEach {
                 updateTtsLanguage()
             }
@@ -53,7 +53,7 @@ class TtsSpeakerImpl @Inject constructor(
     }
 
     private fun updateTtsLanguage() {
-        val language = settingsManager.annotationLanguage.value
+        val language = languageProvider.changes().value
         tts.language = language.toLocale()
     }
 

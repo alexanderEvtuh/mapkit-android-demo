@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocalSpeakerImpl @Inject constructor(
+class LocalSpeaker @Inject constructor(
     private val soundsManager: SoundsManager,
     private val playerManager: PlayerManager
 ) : Speaker {

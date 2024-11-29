@@ -27,15 +27,14 @@ class AnnotationsManagerImpl @Inject constructor(
     navigationHolder: NavigationHolder,
     @ApplicationContext private val context: Context,
     private val settingsManager: SettingsManager,
-    private val ttsSpeaker: Speaker,
+    @Named("ttsSpeaker") private val ttsSpeaker: Speaker,
     @Named("localSpeaker") private val localSpeaker: Speaker,
+    @Named("toastTtsSpeaker") private val ttsToastSpeaker: Speaker,
+    @Named("toastLocalSpeaker") private val localToastSpeaker: Speaker,
 ) : AnnotationsManager {
 
     private val scope = MainScope() + Dispatchers.Main.immediate
     private var annotator: Annotator = navigationHolder.navigation.value.guidance.annotator
-
-    private val ttsToastSpeaker by lazy { ToastSpeaker(context, ttsSpeaker) }
-    private val localToastSpeaker by lazy { ToastSpeaker(context, localSpeaker) }
 
     private val annotatorListener = object : AnnotatorListener {
         override fun manoeuvreAnnotated() {

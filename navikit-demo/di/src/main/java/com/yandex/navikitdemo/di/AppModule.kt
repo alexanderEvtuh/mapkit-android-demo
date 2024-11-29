@@ -6,7 +6,7 @@ import android.content.Context
 import com.yandex.mapkit.annotations.Speaker
 import com.yandex.navikitdemo.data.AnnotationsManagerImpl
 import com.yandex.navikitdemo.data.LocalLanguageProviderImpl
-import com.yandex.navikitdemo.data.LocalSpeakerImpl
+import com.yandex.navikitdemo.data.LocalSpeaker
 import com.yandex.navikitdemo.data.LocationManagerImpl
 import com.yandex.navikitdemo.data.NavigationHolderImpl
 import com.yandex.navikitdemo.data.NavigationManagerImpl
@@ -17,7 +17,8 @@ import com.yandex.navikitdemo.data.SettingsManagerImpl
 import com.yandex.navikitdemo.data.SimulationManagerImpl
 import com.yandex.navikitdemo.data.SoundsManagerImpl
 import com.yandex.navikitdemo.data.SpeakerTokensImpl
-import com.yandex.navikitdemo.data.TtsSpeakerImpl
+import com.yandex.navikitdemo.data.ToastSpeaker
+import com.yandex.navikitdemo.data.TtsSpeaker
 import com.yandex.navikitdemo.data.VehicleOptionsManagerImpl
 import com.yandex.navikitdemo.data.helpers.BackgroundServiceManagerImpl
 import com.yandex.navikitdemo.data.helpers.KeyValueStorageImpl
@@ -48,6 +49,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Named
 import javax.inject.Singleton
@@ -95,12 +97,13 @@ abstract class AppModule {
     @Binds
     abstract fun navigationHolder(impl: NavigationHolderImpl): NavigationHolder
 
+    @Named("ttsSpeaker")
     @Binds
-    abstract fun speakerManager(impl: TtsSpeakerImpl): Speaker
+    abstract fun speakerManager(impl: TtsSpeaker): Speaker
 
     @Named("localSpeaker")
     @Binds
-    abstract fun localSpeakerManager(impl: LocalSpeakerImpl): Speaker
+    abstract fun localSpeakerManager(impl: LocalSpeaker): Speaker
 
     @Binds
     abstract fun annotationsManager(impl: AnnotationsManagerImpl): AnnotationsManager
@@ -128,5 +131,21 @@ abstract class AppModule {
         ): NotificationManager {
             return application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
+
+        @Singleton
+        @Provides
+        @Named("toastLocalSpeaker")
+        fun toastLocalSpeaker(
+            @ApplicationContext context: Context,
+            @Named("localSpeaker") localSpeaker: Speaker,
+        ): Speaker = ToastSpeaker(context, localSpeaker)
+
+        @Singleton
+        @Provides
+        @Named("toastTtsSpeaker")
+        fun toastTtsSpeaker(
+            @ApplicationContext context: Context,
+            @Named("ttsSpeaker") ttsSpeaker: Speaker,
+        ): Speaker = ToastSpeaker(context, ttsSpeaker)
     }
 }
