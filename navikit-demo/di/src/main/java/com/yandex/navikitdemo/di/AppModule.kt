@@ -3,6 +3,7 @@ package com.yandex.navikitdemo.di
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
+import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.Speaker
 import com.yandex.navikitdemo.data.AnnotationsManagerImpl
 import com.yandex.navikitdemo.data.LocalLanguageProviderImpl
@@ -51,6 +52,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -131,6 +133,12 @@ abstract class AppModule {
         ): NotificationManager {
             return application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
+
+        @Singleton
+        @Provides
+        @Named("languageFlow")
+        fun languageFlow(): MutableStateFlow<AnnotationLanguage> =
+            MutableStateFlow(AnnotationLanguage.RUSSIAN)
 
         @Singleton
         @Provides

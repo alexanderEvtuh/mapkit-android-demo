@@ -1,8 +1,8 @@
 package com.yandex.navikitdemo.data.helpers
 
+import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.road_events_layer.RoadEventsLayer
 import com.yandex.navikitdemo.domain.AnnotationsManager
-import com.yandex.navikitdemo.domain.LocalLanguageProvider
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.NavigationLayerManager
 import com.yandex.navikitdemo.domain.NavigationManager
@@ -14,12 +14,14 @@ import com.yandex.navikitdemo.domain.helpers.SettingsBinderManager
 import com.yandex.navikitdemo.domain.isGuidanceActive
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import javax.inject.Named
 
 @ActivityScoped
 class SettingsBinderManagerImpl @Inject constructor(
@@ -32,9 +34,8 @@ class SettingsBinderManagerImpl @Inject constructor(
     private val backgroundServiceManager: BackgroundServiceManager,
     private val navigationManager: NavigationManager,
     private val navigationHolder: NavigationHolder,
-    private val localLanguageProvider: LocalLanguageProvider,
+    @Named("languageFlow") private val languageFlow: MutableStateFlow<AnnotationLanguage>,
 ) : SettingsBinderManager {
-
     override fun applySettingsChanges(scope: CoroutineScope) {
         with(scope) {
             simulationManager()
@@ -161,7 +162,7 @@ class SettingsBinderManagerImpl @Inject constructor(
             .launchIn(this)
 
         settings.annotationLanguage.changes()
-            .onEach { localLanguageProvider.emitLanguage(it) }
+            .onEach { languageFlow.tryEmit(it) }
             .launchIn(this)
     }
 

@@ -13,13 +13,13 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-class LocalLanguageProviderImpl @Inject constructor() : LocalLanguageProvider {
-    private val data =
-        MutableStateFlow(AnnotationLanguage.RUSSIAN)
-
+class LocalLanguageProviderImpl @Inject constructor(
+    @Named("languageFlow") private val data: MutableStateFlow<AnnotationLanguage>,
+) : LocalLanguageProvider {
     override fun changes(): StateFlow<AnnotationLanguage> = data.asStateFlow()
     override fun emitLanguage(language: AnnotationLanguage) {
         data.tryEmit(language)
