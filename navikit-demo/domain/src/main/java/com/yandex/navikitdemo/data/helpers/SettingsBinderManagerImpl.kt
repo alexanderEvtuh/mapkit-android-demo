@@ -12,6 +12,7 @@ import com.yandex.navikitdemo.domain.SimulationManager
 import com.yandex.navikitdemo.domain.helpers.BackgroundServiceManager
 import com.yandex.navikitdemo.domain.helpers.SettingsBinderManager
 import com.yandex.navikitdemo.domain.isGuidanceActive
+import com.yandex.navikitdemo.domain.models.SettingsData
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +36,7 @@ class SettingsBinderManagerImpl @Inject constructor(
     private val navigationManager: NavigationManager,
     private val navigationHolder: NavigationHolder,
     @Named("languageFlow") private val languageFlow: MutableStateFlow<AnnotationLanguage>,
+    @Named("settingFlow") private val settingDataFlow: MutableStateFlow<SettingsData>,
 ) : SettingsBinderManager {
     override fun applySettingsChanges(scope: CoroutineScope) {
         with(scope) {
@@ -162,7 +164,22 @@ class SettingsBinderManagerImpl @Inject constructor(
             .launchIn(this)
 
         settings.annotationLanguage.changes()
-            .onEach { languageFlow.tryEmit(it) }
+            .onEach {
+                languageFlow.tryEmit(it)
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(annotationLanguage = it))
+            }
+            .launchIn(this)
+
+        settings.preRecordedAnnotations.changes()
+            .onEach {
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(preRecordedAnnotations = it))
+            }
+            .launchIn(this)
+
+        settings.textAnnotations.changes()
+            .onEach {
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(textAnnotations = it))
+            }
             .launchIn(this)
     }
 

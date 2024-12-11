@@ -1,6 +1,5 @@
 package com.yandex.navikitdemo.data
 
-import android.content.Context
 import android.util.Log
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.Speaker
@@ -8,12 +7,12 @@ import com.yandex.mapkit.navigation.automotive.Annotator
 import com.yandex.mapkit.navigation.automotive.AnnotatorListener
 import com.yandex.navikitdemo.domain.AnnotationsManager
 import com.yandex.navikitdemo.domain.NavigationHolder
-import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.models.AnnotatedEventsType
 import com.yandex.navikitdemo.domain.models.AnnotatedRoadEventsType
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.yandex.navikitdemo.domain.models.SettingsData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -25,12 +24,11 @@ import javax.inject.Singleton
 @Singleton
 class AnnotationsManagerImpl @Inject constructor(
     navigationHolder: NavigationHolder,
-    @ApplicationContext private val context: Context,
-    private val settingsManager: SettingsManager,
     @Named("ttsSpeaker") private val ttsSpeaker: Speaker,
     @Named("localSpeaker") private val localSpeaker: Speaker,
     @Named("toastTtsSpeaker") private val ttsToastSpeaker: Speaker,
     @Named("toastLocalSpeaker") private val localToastSpeaker: Speaker,
+    @Named("settingFlow") private val settingDataFlow: MutableStateFlow<SettingsData>,
 ) : AnnotationsManager {
 
     private val scope = MainScope() + Dispatchers.Main.immediate
@@ -56,20 +54,17 @@ class AnnotationsManagerImpl @Inject constructor(
 
     init {
         val annotatorFlow = navigationHolder.navigation.map { it.guidance.annotator }
-        val speakerFlow = combine(
-            settingsManager.annotationLanguage.changes(),
-            settingsManager.preRecordedAnnotations.changes(),
-            settingsManager.textAnnotations.changes(),
-        ) { language, preRecordedEnabled, textAnnotationsEnabled ->
-            return@combine if (language in listOf(
+
+        val speakerFlow = settingDataFlow.map {
+            return@map (if (it.annotationLanguage in listOf(
                     AnnotationLanguage.RUSSIAN,
                     AnnotationLanguage.ENGLISH
-                ) && preRecordedEnabled
+                ) && it.preRecordedAnnotations
             ) {
-                if (textAnnotationsEnabled) localToastSpeaker else localSpeaker
+                if (it.textAnnotations) localToastSpeaker else localSpeaker
             } else {
-                if (textAnnotationsEnabled) ttsToastSpeaker else ttsSpeaker
-            }
+                if (it.textAnnotations) ttsToastSpeaker else ttsSpeaker
+            })
         }
 
         combine(speakerFlow, annotatorFlow) { speaker, otherAnnotator ->

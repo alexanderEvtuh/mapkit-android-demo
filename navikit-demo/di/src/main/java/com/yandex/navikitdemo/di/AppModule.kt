@@ -46,6 +46,7 @@ import com.yandex.navikitdemo.domain.helpers.NavigationDeserializer
 import com.yandex.navikitdemo.domain.helpers.NavigationFactory
 import com.yandex.navikitdemo.domain.helpers.NavigationSuspenderManager
 import com.yandex.navikitdemo.domain.mappers.PhraseToSpeakerTokensMapper
+import com.yandex.navikitdemo.domain.models.SettingsData
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -139,6 +140,18 @@ abstract class AppModule {
         @Named("languageFlow")
         fun languageFlow(): MutableStateFlow<AnnotationLanguage> =
             MutableStateFlow(AnnotationLanguage.RUSSIAN)
+
+        @Singleton
+        @Provides
+        @Named("settingFlow")
+        fun settingFlow(settingsManager: SettingsManager): MutableStateFlow<SettingsData> =
+            MutableStateFlow(
+                SettingsData(
+                    settingsManager.annotationLanguage.value,
+                    settingsManager.preRecordedAnnotations.value,
+                    settingsManager.textAnnotations.value
+                )
+            )
 
         @Singleton
         @Provides
