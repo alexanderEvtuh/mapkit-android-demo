@@ -28,6 +28,7 @@ android {
 dependencies {
     implementation project(":com.yandex.navikitdemo.domain")
     implementation project(":com.yandex.navikitdemo.ui")
+    implementation project(":com.yandex.navikitdemo.soundannotations")
 
     implementation "com.yandex.android:maps.mobile:4.8.1-navikit"
 

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace 'com.yandex.navikitdemo'
-    compileSdk 33
+    compileSdk 34
     buildToolsVersion "33.0.0"
 
     defaultConfig {
@@ -57,6 +57,7 @@ dependencies {
     implementation project(":com.yandex.navikitdemo.di")
     implementation project(":com.yandex.navikitdemo.domain")
     implementation project(":com.yandex.navikitdemo.ui")
+    implementation project(":com.yandex.navikitdemo.soundannotations")
 
     implementation "com.yandex.android:maps.mobile:4.8.1-navikit"
     implementation "com.yandex.mapkit.styling:automotivenavigation:4.8.1"

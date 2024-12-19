@@ -34,6 +34,7 @@ dependencies {
     implementation "com.yandex.android:maps.mobile:4.8.1-navikit"
 
     implementation project(":com.yandex.navikitdemo.domain")
+    implementation project(":com.yandex.navikitdemo.soundannotations")
 
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"

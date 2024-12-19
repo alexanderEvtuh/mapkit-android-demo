@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.yandex.navikitdemo.domain'
-    compileSdk 33
+    compileSdk 34
     buildToolsVersion "33.0.0"
 
     defaultConfig {
@@ -26,6 +26,8 @@ android {
 }
 
 dependencies {
+    implementation project(":com.yandex.navikitdemo.soundannotations")
+
     implementation "com.yandex.android:maps.mobile:4.8.1-navikit"
 
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"

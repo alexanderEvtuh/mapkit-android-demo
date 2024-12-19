@@ -7,6 +7,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.map.MapWindow
+import com.yandex.navikitdemo.api.AnnotationsManager
 import com.yandex.navikitdemo.databinding.ActivityAppBinding
 import com.yandex.navikitdemo.domain.NavigationLayerManager
 import com.yandex.navikitdemo.domain.helpers.MapTapManager
@@ -35,6 +36,8 @@ class AppActivity : AppCompatActivity() {
     lateinit var mapTapManager: MapTapManager
     @Inject
     lateinit var navigationLayerManager: NavigationLayerManager
+    @Inject
+    lateinit var annotationsManager: AnnotationsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // We need to initialize mapWindow field before ActivityComponent graph initialization.

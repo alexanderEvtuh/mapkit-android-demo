@@ -1,5 +1,6 @@
 package com.yandex.navikitdemo.ui.settings.settingslist
 
+import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.navikitdemo.domain.SettingModel
 import com.yandex.navikitdemo.domain.SettingsManager
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class SettingsItemsMapper @Inject constructor(
                 SettingsItem.NextScreen(SettingsScreen.DRIVING_OPTIONS),
                 SettingsItem.NextScreen(SettingsScreen.VEHICLE_OPTIONS),
             )
+
             SettingsScreen.VEHICLE_OPTIONS -> listOf(
                 SettingsItem.CheckList(CheckListType.VEHICLE_TYPE),
                 SettingsItem.EditFloat("Weight", settingsManager.weight),
@@ -35,6 +37,7 @@ class SettingsItemsMapper @Inject constructor(
                 SettingsItem.Toggle("Has trailer", settingsManager.hasTrailer),
                 SettingsItem.Toggle("Busway Permitted", settingsManager.buswayPermitted),
             )
+
             SettingsScreen.ROAD_EVENTS -> listOf(
                 SettingsItem.Toggle(
                     "Show Road Events On Route",
@@ -42,23 +45,41 @@ class SettingsItemsMapper @Inject constructor(
                 ),
                 SettingsItem.NextScreen(SettingsScreen.ROAD_EVENTS_ON_ROUTE),
             )
+
             SettingsScreen.ROAD_EVENTS_ON_ROUTE -> buildList {
                 addAll(settingsManager.roadEventsOnRoute.toItems())
             }
+
             SettingsScreen.SOUND_ANNOTATIONS -> listOf(
                 SettingsItem.Toggle("Mute Annotations", settingsManager.muteAnnotations),
                 SettingsItem.CheckList(CheckListType.ANNOTATION_LANGUAGE),
                 SettingsItem.Toggle("Text Annotations", settingsManager.textAnnotations),
                 SettingsItem.Details("Display annotations using Toast popup"),
                 SettingsItem.NextScreen(SettingsScreen.ANNOTATED_EVENTS),
-                SettingsItem.Details("Setting for each event whether it will be annotated or not")
-            )
+                SettingsItem.Details("Setting for each event whether it will be annotated or not"),
+            ) + if (settingsManager.annotationLanguage.value in listOf(
+                    AnnotationLanguage.RUSSIAN,
+                    AnnotationLanguage.ENGLISH
+                )
+            ) {
+                listOf(
+                    SettingsItem.Toggle(
+                        "Use pre-recorded annotations",
+                        settingsManager.preRecordedAnnotations
+                    ),
+                    SettingsItem.Details("Available only in Russian and English languages")
+                )
+            } else {
+                listOf()
+            }
+
             SettingsScreen.ANNOTATED_EVENTS -> buildList {
                 add(SettingsItem.SectionTitle("Annotated Events"))
                 addAll(settingsManager.annotatedEvents.toItems())
                 add(SettingsItem.SectionTitle("Annotated Events On Route"))
                 addAll(settingsManager.annotatedRoadEvents.toItems())
             }
+
             SettingsScreen.DRIVING_OPTIONS -> listOf(
                 SettingsItem.Toggle("Avoid Tolls Routes", settingsManager.avoidTolls),
                 SettingsItem.Toggle("Avoid Unpaved Routes", settingsManager.avoidUnpaved),
@@ -67,12 +88,14 @@ class SettingsItemsMapper @Inject constructor(
                     settingsManager.avoidPoorConditions
                 ),
             )
+
             SettingsScreen.CAMERA -> listOf(
                 SettingsItem.Toggle("Auto Camera", settingsManager.autoCamera),
                 SettingsItem.Toggle("Auto Zoom", settingsManager.autoZoom),
                 SettingsItem.Toggle("Auto Rotation", settingsManager.autoRotation),
                 SettingsItem.EditFloat("Zoom Offset", settingsManager.zoomOffset),
             )
+
             SettingsScreen.MAP -> listOf(
                 SettingsItem.CheckList(CheckListType.STYLE_MODE),
                 SettingsItem.CheckList(CheckListType.JAMS),
@@ -84,15 +107,20 @@ class SettingsItemsMapper @Inject constructor(
                 SettingsItem.Toggle("Show Predicted", settingsManager.showPredicted),
                 SettingsItem.Toggle("Balloons Geometry", settingsManager.balloonsGeometry),
             )
+
             SettingsScreen.SIMULATION -> listOf(
                 SettingsItem.Toggle("Simulation", settingsManager.simulation),
                 SettingsItem.Details("When enabled starts guidance simulation demo"),
                 SettingsItem.EditFloat("Speed", settingsManager.simulationSpeed),
                 SettingsItem.Details("Simulation speed in km/h"),
             )
+
             SettingsScreen.GUIDANCE -> listOf(
                 SettingsItem.SpeedLimits,
-                SettingsItem.EditFloat("Speed limit tolerance", settingsManager.speedLimitTolerance),
+                SettingsItem.EditFloat(
+                    "Speed limit tolerance",
+                    settingsManager.speedLimitTolerance
+                ),
                 SettingsItem.Details("It is responsible for the relative speed value at which annotations play"),
                 SettingsItem.Toggle("Background Guidance", settingsManager.background),
                 SettingsItem.Details("When enabled guidance will be not suspended after AppActivity.onPause"),
