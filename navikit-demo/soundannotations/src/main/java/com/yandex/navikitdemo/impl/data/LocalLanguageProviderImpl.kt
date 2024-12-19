@@ -1,10 +1,10 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.content.res.AssetManager
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
-import com.yandex.navikitdemo.domain.LocalLanguageProvider
-import com.yandex.navikitdemo.domain.utils.path
+import com.yandex.navikitdemo.impl.domain.LocalLanguageProvider
+import com.yandex.navikitdemo.impl.domain.utils.path
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,13 +12,9 @@ import org.json.JSONObject
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
-@Singleton
-class LocalLanguageProviderImpl @Inject constructor(
-    @Named("languageFlow") private val data: MutableStateFlow<AnnotationLanguage>,
+internal class LocalLanguageProviderImpl(
+    private val data: MutableStateFlow<AnnotationLanguage>,
 ) : LocalLanguageProvider {
     override fun changes(): StateFlow<AnnotationLanguage> = data.asStateFlow()
     override fun emitLanguage(language: AnnotationLanguage) {

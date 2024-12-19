@@ -1,38 +1,31 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.util.Log
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.Speaker
 import com.yandex.mapkit.navigation.automotive.Annotator
 import com.yandex.mapkit.navigation.automotive.AnnotatorListener
-import com.yandex.navikitdemo.domain.AnnotationsManager
-import com.yandex.navikitdemo.domain.NavigationHolder
-import com.yandex.navikitdemo.domain.models.AnnotatedEventsType
-import com.yandex.navikitdemo.domain.models.AnnotatedRoadEventsType
-import com.yandex.navikitdemo.domain.models.SettingsData
+import com.yandex.navikitdemo.api.AnnotationDependencies
+import com.yandex.navikitdemo.api.AnnotationsManager
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedEventsType
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedRoadEventsType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.plus
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
-@Singleton
-class AnnotationsManagerImpl @Inject constructor(
-    navigationHolder: NavigationHolder,
-    @Named("ttsSpeaker") private val ttsSpeaker: Speaker,
-    @Named("localSpeaker") private val localSpeaker: Speaker,
-    @Named("toastTtsSpeaker") private val ttsToastSpeaker: Speaker,
-    @Named("toastLocalSpeaker") private val localToastSpeaker: Speaker,
-    @Named("settingFlow") private val settingDataFlow: MutableStateFlow<SettingsData>,
+internal class AnnotationsManagerImpl(
+    private val ttsSpeaker: Speaker,
+    private val localSpeaker: Speaker,
+    private val ttsToastSpeaker: Speaker,
+    private val localToastSpeaker: Speaker,
+    private val annotationDependencies: AnnotationDependencies,
 ) : AnnotationsManager {
 
     private val scope = MainScope() + Dispatchers.Main.immediate
-    private var annotator: Annotator = navigationHolder.navigation.value.guidance.annotator
+    private var annotator: Annotator = annotationDependencies.annotatorFlow.value.guidance.annotator
 
     private val annotatorListener = object : AnnotatorListener {
         override fun manoeuvreAnnotated() {
@@ -53,9 +46,12 @@ class AnnotationsManagerImpl @Inject constructor(
     }
 
     init {
-        val annotatorFlow = navigationHolder.navigation.map { it.guidance.annotator }
+        val annotatorFlow = annotationDependencies.annotatorFlow.map { it.guidance.annotator }
 
-        val speakerFlow = settingDataFlow.map {
+        val speakerFlow = annotationDependencies.annotationsSettingsFlow.map {
+            it.annotatedEventEnabled?.let { setAnnotatedEventEnabled(it.first, it.second) }
+            it.annotatedRoadEventEnabled?.let { setAnnotatedRoadEventEnabled(it.first, it.second) }
+            setAnnotationsEnabled(it.muteAnnotations)
             return@map (if (it.annotationLanguage in listOf(
                     AnnotationLanguage.RUSSIAN,
                     AnnotationLanguage.ENGLISH

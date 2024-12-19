@@ -3,8 +3,8 @@ package com.yandex.navikitdemo.domain
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.directions.driving.VehicleType
 import com.yandex.mapkit.road_events.EventTag
-import com.yandex.navikitdemo.domain.models.AnnotatedEventsType
-import com.yandex.navikitdemo.domain.models.AnnotatedRoadEventsType
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedEventsType
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedRoadEventsType
 import com.yandex.navikitdemo.domain.models.EcoClass
 import com.yandex.navikitdemo.domain.models.JamsMode
 import com.yandex.navikitdemo.domain.models.StyleMode

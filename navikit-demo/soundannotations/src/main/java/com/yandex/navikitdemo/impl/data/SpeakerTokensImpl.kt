@@ -1,24 +1,20 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.content.Context
 import android.net.Uri
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
-import com.yandex.navikitdemo.domain.LocalLanguageProvider
-import com.yandex.navikitdemo.domain.SpeakerTokensManager
-import com.yandex.navikitdemo.domain.models.LocalToken
-import com.yandex.navikitdemo.domain.utils.path
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.yandex.navikitdemo.impl.domain.LocalLanguageProvider
+import com.yandex.navikitdemo.impl.domain.SpeakerTokensManager
+import com.yandex.navikitdemo.impl.domain.models.LocalToken
+import com.yandex.navikitdemo.impl.domain.utils.path
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
-import javax.inject.Singleton
 
 
-@Singleton
-class SpeakerTokensImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val localLanguageProvider: LocalLanguageProvider,
+internal class SpeakerTokensImpl(
+    private val context: Context,
+    localLanguageProvider: LocalLanguageProvider,
 ) : SpeakerTokensManager {
 
     private val scope = MainScope()

@@ -2,7 +2,7 @@ package com.yandex.navikitdemo.data.helpers
 
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.road_events_layer.RoadEventsLayer
-import com.yandex.navikitdemo.domain.AnnotationsManager
+import com.yandex.navikitdemo.api.AnnotationsSettingsData
 import com.yandex.navikitdemo.domain.NavigationHolder
 import com.yandex.navikitdemo.domain.NavigationLayerManager
 import com.yandex.navikitdemo.domain.NavigationManager
@@ -12,7 +12,6 @@ import com.yandex.navikitdemo.domain.SimulationManager
 import com.yandex.navikitdemo.domain.helpers.BackgroundServiceManager
 import com.yandex.navikitdemo.domain.helpers.SettingsBinderManager
 import com.yandex.navikitdemo.domain.isGuidanceActive
-import com.yandex.navikitdemo.domain.models.SettingsData
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,12 +30,11 @@ class SettingsBinderManagerImpl @Inject constructor(
     private val roadEventsLayer: RoadEventsLayer,
     private val navigationLayerManager: NavigationLayerManager,
     private val navigationStyleManager: NavigationStyleManager,
-    private val annotationsManager: AnnotationsManager,
     private val backgroundServiceManager: BackgroundServiceManager,
     private val navigationManager: NavigationManager,
     private val navigationHolder: NavigationHolder,
     @Named("languageFlow") private val languageFlow: MutableStateFlow<AnnotationLanguage>,
-    @Named("settingFlow") private val settingDataFlow: MutableStateFlow<SettingsData>,
+    @Named("annotationsSettingsData") private val settingDataFlow: MutableStateFlow<AnnotationsSettingsData>,
 ) : SettingsBinderManager {
     override fun applySettingsChanges(scope: CoroutineScope) {
         with(scope) {
@@ -145,7 +143,7 @@ class SettingsBinderManagerImpl @Inject constructor(
             }
             .merge()
             .onEach { (event, isEnabled) ->
-                annotationsManager.setAnnotatedEventEnabled(event, isEnabled)
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(annotatedEventEnabled = event to isEnabled))
             }
             .launchIn(this)
 
@@ -155,12 +153,14 @@ class SettingsBinderManagerImpl @Inject constructor(
             }
             .merge()
             .onEach { (event, isEnabled) ->
-                annotationsManager.setAnnotatedRoadEventEnabled(event, isEnabled)
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(annotatedRoadEventEnabled = event to isEnabled))
             }
             .launchIn(this)
 
         settings.muteAnnotations.changes()
-            .onEach { annotationsManager.setAnnotationsEnabled(!it) }
+            .onEach {
+                settingDataFlow.tryEmit(settingDataFlow.value.copy(muteAnnotations = !it))
+            }
             .launchIn(this)
 
         settings.annotationLanguage.changes()

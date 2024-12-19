@@ -6,8 +6,8 @@ import com.yandex.mapkit.road_events.EventTag
 import com.yandex.navikitdemo.domain.SettingModel
 import com.yandex.navikitdemo.domain.SettingsManager
 import com.yandex.navikitdemo.domain.helpers.KeyValueStorage
-import com.yandex.navikitdemo.domain.models.AnnotatedEventsType
-import com.yandex.navikitdemo.domain.models.AnnotatedRoadEventsType
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedEventsType
+import com.yandex.navikitdemo.impl.domain.models.AnnotatedRoadEventsType
 import com.yandex.navikitdemo.domain.models.EcoClass
 import com.yandex.navikitdemo.domain.models.JamsMode
 import com.yandex.navikitdemo.domain.models.StyleMode

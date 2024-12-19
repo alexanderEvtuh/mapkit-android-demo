@@ -1,4 +1,4 @@
-package com.yandex.navikitdemo.domain.models
+package com.yandex.navikitdemo.impl.domain.models
 
 import android.net.Uri
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
@@ -9,6 +9,6 @@ data class LocalToken(
     val uri: Uri,
 )
 
-class LocalPhrase(val items: List<LocalToken>) {
+internal class LocalPhrase(val items: List<LocalToken>) {
     val duration by lazy { items.sumOf { it.duration } }
 }

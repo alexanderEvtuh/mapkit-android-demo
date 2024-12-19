@@ -1,8 +1,8 @@
-package com.yandex.navikitdemo.domain.utils
+package com.yandex.navikitdemo.impl.domain.utils
 
 import com.yandex.mapkit.annotations.SpeakerPhraseToken
 
-val SpeakerPhraseToken.path: String
+internal val SpeakerPhraseToken.path: String
     get() = when (this) {
         SpeakerPhraseToken.METER -> "Meter"
         SpeakerPhraseToken.METERS -> "Meters"

@@ -1,23 +1,19 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.mapkit.annotations.Speaker
-import com.yandex.navikitdemo.domain.LocalLanguageProvider
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.yandex.navikitdemo.impl.domain.LocalLanguageProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.util.Locale
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class TtsSpeaker @Inject constructor(
-    @ApplicationContext context: Context,
+internal class TtsSpeaker(
+    context: Context,
     private val languageProvider: LocalLanguageProvider,
 ) : Speaker {
 

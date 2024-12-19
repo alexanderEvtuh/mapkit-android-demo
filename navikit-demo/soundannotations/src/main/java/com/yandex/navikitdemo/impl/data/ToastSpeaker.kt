@@ -1,11 +1,11 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.content.Context
 import android.widget.Toast
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.mapkit.annotations.Speaker
 
-class ToastSpeaker(
+internal class ToastSpeaker(
     private val context: Context,
     private val internalSpeaker: Speaker
 ) : Speaker {

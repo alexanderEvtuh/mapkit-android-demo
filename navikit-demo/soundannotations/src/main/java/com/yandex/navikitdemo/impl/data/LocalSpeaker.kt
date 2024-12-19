@@ -1,15 +1,12 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import com.yandex.mapkit.annotations.LocalizedPhrase
 import com.yandex.mapkit.annotations.Speaker
-import com.yandex.navikitdemo.domain.PlayerManager
-import com.yandex.navikitdemo.domain.SoundsManager
-import com.yandex.navikitdemo.domain.models.LocalPhrase
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.yandex.navikitdemo.impl.domain.PlayerManager
+import com.yandex.navikitdemo.impl.domain.SoundsManager
+import com.yandex.navikitdemo.impl.domain.models.LocalPhrase
 
-@Singleton
-class LocalSpeaker @Inject constructor(
+internal class LocalSpeaker(
     private val soundsManager: SoundsManager,
     private val playerManager: PlayerManager
 ) : Speaker {

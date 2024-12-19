@@ -1,4 +1,4 @@
-package com.yandex.navikitdemo.domain.models
+package com.yandex.navikitdemo.impl.domain.models
 
 import com.yandex.mapkit.navigation.automotive.AnnotatedEvents
 import com.yandex.mapkit.navigation.automotive.AnnotatedRoadEvents

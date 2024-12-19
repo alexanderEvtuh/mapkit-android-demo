@@ -1,16 +1,12 @@
-package com.yandex.navikitdemo.data
+package com.yandex.navikitdemo.impl.data
 
 import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
-import com.yandex.navikitdemo.domain.PlayerManager
-import com.yandex.navikitdemo.domain.models.LocalToken
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
+import com.yandex.navikitdemo.impl.domain.PlayerManager
+import com.yandex.navikitdemo.impl.domain.models.LocalToken
 
-class PlayerManagerImpl @Inject constructor(
-    @ApplicationContext context: Context,
-) : PlayerManager {
+internal class PlayerManagerImpl(context: Context) : PlayerManager {
     private val player: ExoPlayer by lazy { ExoPlayer.Builder(context).build() }
 
     override fun play(queue: List<LocalToken>) {
